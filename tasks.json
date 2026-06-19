@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "task": "Mengerjakan tugas web",
+    "description": "Menyelesaikan backend server.js dan koneksi database",
+    "status": "belum",
+    "category": "Kuliah",
+    "priority": 1,
+    "dueDate": "2026-06-25",
+    "createdAt": "2026-06-19"
+  },
+  {
+    "id": 2,
+    "task": "Belajar konsep API",
+    "description": "Memahami cara kerja endpoint GET dan POST",
+    "status": "selesai",
+    "category": "Kuliah",
+    "priority": 2,
+    "dueDate": "2026-06-20",
+    "createdAt": "2026-06-18"
+  },
+  {
+    "id": 3,
+    "task": "Beli perlengkapan harian",
+    "description": "Beli sabun, pasta gigi, dan kebutuhan mandi",
+    "status": "belum",
+    "category": "Pribadi",
+    "priority": 3,
+    "dueDate": "2026-06-20",
+    "createdAt": "2026-06-19"
+  }
+]
