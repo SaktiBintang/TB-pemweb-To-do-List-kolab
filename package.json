@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/SaktiBintang/TB-pemweb-To-do-List-kolab#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mysql2": "^3.22.5"
   }

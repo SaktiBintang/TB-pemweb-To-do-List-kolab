@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; padding: 20px; }
+        h1 { color: #333; }
+        #task-input, #due-date-input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
+        ul { list-style: none; padding: 0; }
+        li { background: white; padding: 10px; margin-bottom: 5px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .done { text-decoration: line-through; color: gray; }
+    </style>
+</head>
+<body>
+    <h1>Daftar Tugas Saya</h1>
+    <input type="text" id="task-input" placeholder="Tugas baru...">
+    <input type="date" id="due-date-input">
+    <button onclick="addTask()">Tambah Tugas</button>
+    <ul id="task-list"></ul>
+
+    <script>
+        function addTask() {
+            const title = document.getElementById('task-input').value;
+            const dueDate = document.getElementById('due-date-input').value;
+            
+            // VALIDASI (Penjaga pintu)
+            if (title === '' || dueDate === '') {
+                alert("Harap isi nama tugas dan tanggalnya!");
+                return;
+            }
+
+            fetch('http://localhost:3000/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title, due_date: dueDate })
+            }).then(() => location.reload());
+        }
+
+        function deleteTask(id) {
+            fetch(`http://localhost:3000/tasks/${id}`, { method: 'DELETE' }).then(() => location.reload());
+        }
+
+        function updateStatus(id, isChecked) {
+            fetch(`http://localhost:3000/tasks/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: isChecked ? 'done' : 'pending' })
+            }).then(() => location.reload());
+        }
+
+        fetch('http://localhost:3000/tasks')
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('task-list');
+                data.forEach(task => {
+                    const dateText = task.due_date ? ` (Deadline: ${task.due_date.split('T')[0]})` : '';
+                    list.innerHTML += `<li>
+                        <span><input type="checkbox" ${task.status === 'done' ? 'checked' : ''} onchange="updateStatus(${task.id}, this.checked)"> 
+                        <span class="${task.status === 'done' ? 'done' : ''}">${task.title} <strong>${dateText}</strong></span></span>
+                        <button onclick="deleteTask(${task.id})">Hapus</button>
+                    </li>`;
+                });
+            });
+    </script>
+</body>
+</html>
