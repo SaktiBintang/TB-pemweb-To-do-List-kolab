@@ -17,23 +17,42 @@
     <input type="text" id="task-input" placeholder="Tugas baru...">
     <input type="date" id="due-date-input">
     <button onclick="addTask()">Tambah Tugas</button>
+    <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
     <ul id="task-list"></ul>
 
     <script>
+        // 1. PROTEKSI: Cek apakah user sudah login
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            window.location.href = 'login.html'; // Jika tidak ada ID, tendang ke login
+        }
+
+        // 2. FUNGSI AMBIL DATA (Hanya milik user ini)
+        fetch(`http://localhost:3000/tasks?user_id=${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('task-list');
+                data.forEach(task => {
+                    const dateText = task.due_date ? ` (Deadline: ${task.due_date.split('T')[0]})` : '';
+                    list.innerHTML += `<li>
+                        <span><input type="checkbox" ${task.status === 'done' ? 'checked' : ''} onchange="updateStatus(${task.id}, this.checked)"> 
+                        <span class="${task.status === 'done' ? 'done' : ''}">${task.title} <strong>${dateText}</strong></span></span>
+                        <button onclick="deleteTask(${task.id})">Hapus</button>
+                    </li>`;
+                });
+            });
+
+        // 3. TAMBAH TUGAS (Sertakan userId)
         function addTask() {
             const title = document.getElementById('task-input').value;
             const dueDate = document.getElementById('due-date-input').value;
             
-            // VALIDASI (Penjaga pintu)
-            if (title === '' || dueDate === '') {
-                alert("Harap isi nama tugas dan tanggalnya!");
-                return;
-            }
+            if (title === '' || dueDate === '') return alert("Isi semua kolom!");
 
             fetch('http://localhost:3000/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: title, due_date: dueDate })
+                body: JSON.stringify({ title, due_date: dueDate, user_id: userId, category_id: 1 })
             }).then(() => location.reload());
         }
 
@@ -49,19 +68,10 @@
             }).then(() => location.reload());
         }
 
-        fetch('http://localhost:3000/tasks')
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById('task-list');
-                data.forEach(task => {
-                    const dateText = task.due_date ? ` (Deadline: ${task.due_date.split('T')[0]})` : '';
-                    list.innerHTML += `<li>
-                        <span><input type="checkbox" ${task.status === 'done' ? 'checked' : ''} onchange="updateStatus(${task.id}, this.checked)"> 
-                        <span class="${task.status === 'done' ? 'done' : ''}">${task.title} <strong>${dateText}</strong></span></span>
-                        <button onclick="deleteTask(${task.id})">Hapus</button>
-                    </li>`;
-                });
-            });
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
