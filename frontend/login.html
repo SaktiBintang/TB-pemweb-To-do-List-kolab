@@ -37,11 +37,13 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    // MENYIMPAN TOKEN DAN USER ID KE LOCALSTORAGE
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.userId); 
                     
-                    alert('Login Berhasil!');
+                    // MENYIMPAN TOKEN, USER ID, DAN ROLE KE LOCALSTORAGE
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.userId);
+                    localStorage.setItem('role', data.role); // <-- Role disimpan di sini
+                    
+                    alert('Login Berhasil sebagai ' + data.role);
                     window.location.href = 'index.html'; 
                 } else {
                     alert('Login Gagal, cek username atau password');

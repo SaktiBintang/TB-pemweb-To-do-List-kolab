@@ -18,20 +18,30 @@
     <input type="date" id="due-date-input">
     <button onclick="addTask()">Tambah Tugas</button>
     <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
+    <div id="admin-panel" style="margin-top: 10px;"></div>
     <ul id="task-list"></ul>
 
     <script>
-        // 1. PROTEKSI: Cek apakah user sudah login
+        // 1. PROTEKSI & AMBIL ROLE
         const userId = localStorage.getItem('userId');
+        const role = localStorage.getItem('role');
+
         if (!userId) {
-            window.location.href = 'login.html'; // Jika tidak ada ID, tendang ke login
+            window.location.href = 'login.html'; 
         }
 
-        // 2. FUNGSI AMBIL DATA (Hanya milik user ini)
-        fetch(`http://localhost:3000/tasks?user_id=${userId}`)
+        // Jika admin, tambahkan tombol ke Admin Panel
+        if (role === 'admin') {
+            document.getElementById('admin-panel').innerHTML = 
+                `<button onclick="window.location.href='admin.html'" style="background-color: #007bff;">Masuk ke Admin Panel</button>`;
+        }
+
+        // 2. FUNGSI AMBIL DATA (Sekarang mengirimkan user_id DAN role)
+        fetch(`http://localhost:3000/tasks?user_id=${userId}&role=${role}`)
             .then(res => res.json())
             .then(data => {
                 const list = document.getElementById('task-list');
+                list.innerHTML = ''; // Bersihkan list sebelum diisi
                 data.forEach(task => {
                     const dateText = task.due_date ? ` (Deadline: ${task.due_date.split('T')[0]})` : '';
                     list.innerHTML += `<li>
@@ -42,7 +52,7 @@
                 });
             });
 
-        // 3. TAMBAH TUGAS (Sertakan userId)
+        // 3. TAMBAH TUGAS
         function addTask() {
             const title = document.getElementById('task-input').value;
             const dueDate = document.getElementById('due-date-input').value;

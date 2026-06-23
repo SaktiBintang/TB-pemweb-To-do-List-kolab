@@ -15,7 +15,7 @@ app.use(express.json());
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err) => {
+    db.query('INSERT INTO users (username, password, role) VALUES (?, ?, "user")', [username, hashedPassword], (err) => {
         if (err) return res.status(500).send('Gagal mendaftar');
         res.status(201).send('User berhasil terdaftar');
     });
@@ -26,24 +26,47 @@ app.post('/login', (req, res) => {
     db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
         if (err || results.length === 0) return res.status(401).send('User tidak ditemukan');
         
-        const isMatch = await bcrypt.compare(password, results[0].password);
+        const user = results[0]; 
+        const isMatch = await bcrypt.compare(password, user.password);
+        
         if (!isMatch) return res.status(401).send('Password salah');
         
-        const token = jwt.sign({ id: results[0].id, role: results[0].role }, SECRET_KEY, { expiresIn: '1h' });
-        // MENGIRIM userId KE FRONTEND AGAR BISA DISIMPAN DI LOCALSTORAGE
-        res.json({ token, userId: results[0].id });
+        const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+        
+        res.json({ 
+            message: 'Login Berhasil',
+            token: token, 
+            userId: user.id,
+            role: user.role 
+        });
     });
 });
 
 // --- TASKS (CRUD DENGAN ISOLASI DATA) ---
 
-// 1. GET Tasks dengan filter user_id
 app.get('/tasks', (req, res) => {
-    const { user_id } = req.query;
-    const sql = user_id ? 'SELECT * FROM tasks WHERE user_id = ?' : 'SELECT * FROM tasks';
+    const { user_id, role } = req.query;
+    let sql = 'SELECT * FROM tasks';
+    let params = [];
+
+    if (role !== 'admin') {
+        sql = 'SELECT * FROM tasks WHERE user_id = ?';
+        params = [user_id];
+    }
     
-    db.query(sql, [user_id], (err, results) => {
+    db.query(sql, params, (err, results) => {
         if (err) return res.status(500).send('Gagal mengambil data');
+        res.json(results);
+    });
+});
+
+// --- ENDPOINT KHUSUS ADMIN ---
+
+app.get('/admin/tasks', (req, res) => {
+    // Mengambil semua tugas beserta nama user pemiliknya menggunakan JOIN
+    const query = "SELECT tasks.*, users.username FROM tasks JOIN users ON tasks.user_id = users.id";
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).send(err);
         res.json(results);
     });
 });

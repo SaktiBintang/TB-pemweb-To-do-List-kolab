@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin</title>
+</head>
+<body>
+    <h1>Halaman Khusus Admin</h1>
+    <a href="index.html">Kembali ke Dashboard</a>
+    <hr>
+    
+    <h2>Daftar Semua Tugas (Monitoring)</h2>
+    <ul id="admin-task-list"></ul>
+
+    <script>
+        // --- PROTEKSI HALAMAN ---
+        const role = localStorage.getItem('role');
+        if (role !== 'admin') {
+            alert('Akses ditolak! Anda bukan admin.');
+            window.location.href = 'index.html';
+        }
+
+        // --- AMBIL DATA TUGAS DARI SERVER ---
+        fetch('http://localhost:3000/admin/tasks')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('admin-task-list');
+                if (data.length === 0) {
+                    list.innerHTML = '<li>Belum ada tugas yang dibuat.</li>';
+                    return;
+                }
+                
+                data.forEach(task => {
+                    // Pastikan nama kolom sesuai dengan database kamu (title/task)
+                    list.innerHTML += `<li><strong>${task.username}</strong> membuat tugas: ${task.title} (Deadline: ${task.due_date})</li>`;
+                });
+            })
+            .catch(err => {
+                console.error('Gagal mengambil data:', err);
+                alert('Gagal memuat daftar tugas.');
+            });
+    </script>
+</body>
+</html>
