@@ -1,44 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Poppins', sans-serif; padding-top: 50px; }
+        .card { 
+            border-radius: 30px !important; 
+            border: none; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important; 
+            max-width: 800px;
+            margin: auto;
+        }
+        .list-group-item { 
+            border-radius: 20px !important; 
+            margin-bottom: 12px !important; 
+            border: 1px solid rgba(0,0,0,0.05) !important; 
+            padding: 15px 20px !important; 
+            background-color: #fff;
+        }
+        .badge-deadline {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>Halaman Khusus Admin</h1>
-    <a href="index.html">Kembali ke Dashboard</a>
-    <hr>
-    
-    <h2>Daftar Semua Tugas (Monitoring)</h2>
-    <ul id="admin-task-list"></ul>
 
-    <script>
-        // --- PROTEKSI HALAMAN ---
-        const role = localStorage.getItem('role');
-        if (role !== 'admin') {
-            alert('Akses ditolak! Anda bukan admin.');
-            window.location.href = 'index.html';
-        }
+<div class="container">
+    <div class="card p-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Admin Panel</h2>
+                <a href="index.html" class="btn btn-outline-secondary rounded-pill">Kembali ke Dashboard</a>
+            </div>
 
-        // --- AMBIL DATA TUGAS DARI SERVER ---
-        fetch('http://localhost:3000/admin/tasks')
-            .then(response => response.json())
-            .then(data => {
-                const list = document.getElementById('admin-task-list');
-                if (data.length === 0) {
-                    list.innerHTML = '<li>Belum ada tugas yang dibuat.</li>';
-                    return;
-                }
-                
-                data.forEach(task => {
-                    // Pastikan nama kolom sesuai dengan database kamu (title/task)
-                    list.innerHTML += `<li><strong>${task.username}</strong> membuat tugas: ${task.title} (Deadline: ${task.due_date})</li>`;
-                });
-            })
-            .catch(err => {
-                console.error('Gagal mengambil data:', err);
-                alert('Gagal memuat daftar tugas.');
+            <h5 class="mb-3 text-muted">Daftar Semua Tugas (Monitoring)</h5>
+            <ul id="admin-task-list" class="list-group">
+                </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Proteksi: Hanya admin yang boleh akses
+    const role = localStorage.getItem('role');
+    if (role !== 'admin') {
+        alert('Akses ditolak!');
+        window.location.href = 'index.html';
+    }
+
+    // Ambil data tugas
+    fetch('http://localhost:3000/admin/tasks')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('admin-task-list');
+            list.innerHTML = ''; 
+            
+            data.forEach(task => {
+                const dateText = task.due_date ? task.due_date.split('T')[0] : '-';
+                list.innerHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="text-primary">${task.username}</strong> membuat tugas: 
+                            <span class="fw-semibold">${task.title}</span>
+                        </div>
+                        <span class="badge-deadline">Deadline: ${dateText}</span>
+                    </li>`;
             });
-    </script>
+        })
+        .catch(err => console.error('Gagal memuat data:', err));
+</script>
 </body>
 </html>
