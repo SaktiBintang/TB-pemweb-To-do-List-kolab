@@ -6,30 +6,8 @@
     <title>Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f0f2f5; font-family: 'Poppins', sans-serif; padding-top: 50px; }
-        .card { 
-            border-radius: 30px !important; 
-            border: none; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important; 
-            max-width: 800px;
-            margin: auto;
-        }
-        .list-group-item { 
-            border-radius: 20px !important; 
-            margin-bottom: 12px !important; 
-            border: 1px solid rgba(0,0,0,0.05) !important; 
-            padding: 15px 20px !important; 
-            background-color: #fff;
-        }
-        .badge-deadline {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 0.8rem;
-        }
-    </style>
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/admin.css" rel="stylesheet">
 </head>
 <body>
 
@@ -48,34 +26,7 @@
     </div>
 </div>
 
-<script>
-    // Proteksi: Hanya admin yang boleh akses
-    const role = localStorage.getItem('role');
-    if (role !== 'admin') {
-        alert('Akses ditolak!');
-        window.location.href = 'index.html';
-    }
-
-    // Ambil data tugas
-    fetch('http://localhost:3000/admin/tasks')
-        .then(response => response.json())
-        .then(data => {
-            const list = document.getElementById('admin-task-list');
-            list.innerHTML = ''; 
-            
-            data.forEach(task => {
-                const dateText = task.due_date ? task.due_date.split('T')[0] : '-';
-                list.innerHTML += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong class="text-primary">${task.username}</strong> membuat tugas: 
-                            <span class="fw-semibold">${task.title}</span>
-                        </div>
-                        <span class="badge-deadline">Deadline: ${dateText}</span>
-                    </li>`;
-            });
-        })
-        .catch(err => console.error('Gagal memuat data:', err));
-</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/admin.js"></script>
 </body>
 </html>

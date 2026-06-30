@@ -1,0 +1,25 @@
+/* Admin Panel Specific Styles */
+body {
+    padding-top: 50px;
+}
+
+.card {
+    max-width: 800px;
+    margin: auto;
+}
+
+.list-group-item {
+    border-radius: 20px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    padding: 15px 20px !important;
+    background-color: #fff;
+}
+
+.badge-deadline {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+}
