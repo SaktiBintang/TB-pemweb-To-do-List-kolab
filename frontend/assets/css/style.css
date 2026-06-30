@@ -1,0 +1,25 @@
+/* Global Reset & Base Styles */
+body {
+    background-color: #f0f2f5;
+    font-family: 'Poppins', sans-serif;
+}
+
+.card {
+    border-radius: 30px !important;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Auth Page specific styling */
+.auth-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+}
+
